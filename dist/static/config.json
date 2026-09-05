@@ -1,0 +1,14 @@
+{
+  "prices": {
+    "plus": 130.99,
+    "x5": 720,
+    "x20": 1180
+  },
+  "contact": {
+    "label": "联系客服",
+    "hint": "扫码添加微信客服",
+    "imagePath": "static/wechat.JPG",
+    "imageAlt": "微信客服二维码",
+    "wechatId": "lllulitao"
+  }
+}

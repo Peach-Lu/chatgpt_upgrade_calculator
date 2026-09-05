@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatGPT 套餐升级差价计算器</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --accent:#111827;
+      --soft:#f3f4f6;
+      --ok:#047857;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:980px;
+      margin:40px auto;
+      padding:0 18px 48px;
+    }
+    h1{
+      font-size:28px;
+      margin:0;
+    }
+    .title-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:8px;
+    }
+    .contact-widget{
+      position:relative;
+      flex:none;
+    }
+    .contact-trigger{
+      appearance:none;
+      border:1px solid #d1d5db;
+      border-radius:999px;
+      padding:8px 12px;
+      background:#fff;
+      color:#374151;
+      font:inherit;
+      font-size:14px;
+      font-weight:600;
+      white-space:nowrap;
+      cursor:pointer;
+      transition:border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .contact-trigger:hover,
+    .contact-trigger:focus-visible{
+      border-color:#9ca3af;
+      background:#f9fafb;
+      box-shadow:0 0 0 3px rgba(107,114,128,.14);
+      outline:0;
+    }
+    .contact-popover{
+      position:absolute;
+      z-index:10;
+      top:calc(100% + 10px);
+      right:0;
+      width:230px;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:#fff;
+      box-shadow:0 14px 32px rgba(0,0,0,.14);
+      opacity:0;
+      visibility:hidden;
+      transform:translateY(-4px);
+      transition:opacity .18s ease, transform .18s ease, visibility .18s ease;
+    }
+    .contact-widget:hover .contact-popover,
+    .contact-widget:focus-within .contact-popover,
+    .contact-widget.is-open .contact-popover{
+      opacity:1;
+      visibility:visible;
+      transform:translateY(0);
+    }
+    .contact-popover p{
+      margin:0 0 9px;
+      color:#4b5563;
+      font-size:13px;
+      line-height:1.5;
+      text-align:center;
+    }
+    .contact-popover img{
+      display:block;
+      width:100%;
+      border-radius:8px;
+    }
+    .wechat-id{
+      width:100%;
+      margin-top:10px;
+      padding:9px 10px;
+      border:1px dashed #cbd5e1;
+      border-radius:8px;
+      background:#f8fafc;
+      color:#334155;
+      font:inherit;
+      font-size:13px;
+      cursor:pointer;
+      transition:background .18s ease, border-color .18s ease;
+    }
+    .wechat-id:hover,
+    .wechat-id:focus-visible{
+      border-color:#94a3b8;
+      background:#f1f5f9;
+      outline:0;
+    }
+    .sub{
+      color:var(--muted);
+      margin-bottom:24px;
+      line-height:1.7;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:20px;
+      box-shadow:0 8px 30px rgba(0,0,0,.04);
+    }
+    .card h2{
+      margin:0 0 16px;
+      font-size:19px;
+    }
+    label{
+      display:block;
+      font-size:14px;
+      color:#374151;
+      margin:14px 0 7px;
+      font-weight:600;
+    }
+    select,input{
+      width:100%;
+      padding:12px 13px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      font-size:15px;
+      background:white;
+      outline:none;
+    }
+    select:focus,input:focus{
+      border-color:#9ca3af;
+    }
+    .tiers{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:8px;
+    }
+    .tier{
+      border:1px solid var(--border);
+      background:var(--soft);
+      border-radius:14px;
+      padding:12px;
+    }
+    .tier b{
+      display:block;
+      margin-bottom:6px;
+    }
+    .tier input{
+      padding:9px 10px;
+    }
+    .result{
+      margin-top:8px;
+      display:grid;
+      gap:10px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      padding:12px 0;
+      border-bottom:1px dashed var(--border);
+    }
+    .row:last-child{border-bottom:0}
+    .row span:first-child{color:var(--muted)}
+    .money{
+      font-weight:700;
+      font-size:17px;
+    }
+    .big{
+      margin-top:14px;
+      background:#111827;
+      color:white;
+      border-radius:16px;
+      padding:18px;
+    }
+    .big .label{
+      opacity:.75;
+      font-size:13px;
+      margin-bottom:6px;
+    }
+    .big .value{
+      font-size:34px;
+      font-weight:800;
+    }
+    .formula{
+      margin-top:14px;
+      padding:13px 14px;
+      background:#f9fafb;
+      border-radius:12px;
+      color:#4b5563;
+      line-height:1.7;
+      font-size:14px;
+    }
+    .quick{
+      margin-top:18px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+      border-radius:12px;
+    }
+    th,td{
+      padding:11px 10px;
+      border-bottom:1px solid var(--border);
+      text-align:center;
+      font-size:14px;
+    }
+    th{background:#f9fafb}
+    tr:last-child td{border-bottom:0}
+    .note{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.7;
+    }
+    @media(max-width:760px){
+      .grid{grid-template-columns:1fr}
+      .tiers{grid-template-columns:1fr}
+      .title-row{align-items:flex-start}
+      h1{font-size:24px}
+      .contact-popover{width:210px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title-row">
+      <h1>ChatGPT 套餐升级差价计算器</h1>
+      <div class="contact-widget" id="contactWidget">
+        <button class="contact-trigger" id="contactTrigger" type="button" aria-expanded="false" aria-controls="contactPopover">联系客服</button>
+        <div class="contact-popover" id="contactPopover" role="region" aria-label="客服微信">
+          <p id="contactHint">扫码添加微信客服</p>
+          <img id="contactImage" src="static/wechat.JPG" alt="微信客服二维码">
+          <button class="wechat-id" id="wechatIdButton" type="button" data-wechat-id="lllulitao">微信号：lllulitao（点击复制）</button>
+        </div>
+      </div>
+    </div>
+    <div class="sub" id="pricingSummary">
+      默认按你当前的人民币售价：Plus ¥130 / 月、Pro x5 ¥720 / 月、Pro x20 ¥1180 / 月。<br>
+      计算逻辑：新套餐从今天重新开一个完整周期，旧套餐剩余价值按剩余天数抵扣。
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>套餐与剩余时间</h2>
+
+        <div class="tiers">
+          <div class="tier">
+            <b>Plus</b>
+            <input id="pricePlus" type="number" min="0" step="0.01" value="130">
+          </div>
+          <div class="tier">
+            <b>Pro x5</b>
+            <input id="priceX5" type="number" min="0" step="0.01" value="720">
+          </div>
+          <div class="tier">
+            <b>Pro x20</b>
+            <input id="priceX20" type="number" min="0" step="0.01" value="1180">
+          </div>
+        </div>
+
+        <label>当前套餐</label>
+        <select id="currentTier">
+          <option value="plus">Plus</option>
+          <option value="x5" selected>Pro x5</option>
+          <option value="x20">Pro x20</option>
+        </select>
+
+        <label>目标套餐</label>
+        <select id="targetTier">
+          <option value="plus">Plus</option>
+          <option value="x5">Pro x5</option>
+          <option value="x20" selected>Pro x20</option>
+        </select>
+
+        <label>当前套餐剩余天数</label>
+        <input id="daysLeft" type="number" min="0" step="1" value="20">
+
+        <label>一个计费周期天数</label>
+        <input id="cycleDays" type="number" min="1" step="1" value="30">
+      </div>
+
+      <div class="card">
+        <h2>计算结果</h2>
+        <div class="result">
+          <div class="row">
+            <span>当前套餐月价</span>
+            <span class="money" id="currentPrice">¥720.00</span>
+          </div>
+          <div class="row">
+            <span>当前套餐剩余价值</span>
+            <span class="money" id="remainingValue">¥480.00</span>
+          </div>
+          <div class="row">
+            <span>目标套餐月价</span>
+            <span class="money" id="targetPrice">¥1180.00</span>
+          </div>
+          <div class="row">
+            <span>本次抵扣</span>
+            <span class="money" id="credit">-¥480.00</span>
+          </div>
+        </div>
+
+        <div class="big">
+          <div class="label">预计今天还需支付</div>
+          <div class="value" id="dueToday">¥700.00</div>
+        </div>
+
+        <div class="formula" id="formula">
+          ¥1180.00 − (¥720.00 × 20 ÷ 30) = ¥700.00
+        </div>
+      </div>
+    </div>
+
+    <div class="card quick">
+      <h2>常用档位快速对照</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>当前套餐</th>
+            <th>目标套餐</th>
+            <th>剩余天数</th>
+            <th>旧套餐剩余价值</th>
+            <th>预计补款</th>
+          </tr>
+        </thead>
+        <tbody id="quickTable"></tbody>
+      </table>
+      <div class="note">
+        说明：本计算器按“旧套餐剩余价值抵扣 + 新套餐重新开完整月”计算。实际支付页面如存在税费、汇率、平台定价或特殊抵扣规则，请以最终支付页面为准。
+      </div>
+    </div>
+  </div>
+
+<script>
+  const ids = [
+    "pricePlus","priceX5","priceX20",
+    "currentTier","targetTier","daysLeft","cycleDays"
+  ];
+
+  const tierName = {
+    plus: "Plus",
+    x5: "Pro x5",
+    x20: "Pro x20"
+  };
+
+  const defaultConfig = {
+    prices: { plus: 130, x5: 720, x20: 1180 },
+    contact: {
+      label: "联系客服",
+      hint: "扫码添加微信客服",
+      imagePath: "static/wechat.JPG",
+      imageAlt: "微信客服二维码",
+      wechatId: "lllulitao"
+    }
+  };
+
+  function prices(){
+    return {
+      plus: parseFloat(document.getElementById("pricePlus").value) || 0,
+      x5: parseFloat(document.getElementById("priceX5").value) || 0,
+      x20: parseFloat(document.getElementById("priceX20").value) || 0
+    };
+  }
+
+  function fmt(v){
+    return "¥" + Number(v).toFixed(2);
+  }
+
+  function calcDue(current, target, daysLeft, cycleDays, p){
+    const currentPrice = p[current];
+    const targetPrice = p[target];
+    const remain = currentPrice * Math.max(0, daysLeft) / Math.max(1, cycleDays);
+    const due = Math.max(0, targetPrice - remain);
+    return {currentPrice, targetPrice, remain, due};
+  }
+
+  function update(){
+    const p = prices();
+    const current = document.getElementById("currentTier").value;
+    const target = document.getElementById("targetTier").value;
+    const daysLeft = parseInt(document.getElementById("daysLeft").value, 10) || 0;
+    const cycleDays = parseInt(document.getElementById("cycleDays").value, 10) || 30;
+
+    const r = calcDue(current, target, daysLeft, cycleDays, p);
+
+    document.getElementById("currentPrice").textContent = fmt(r.currentPrice);
+    document.getElementById("remainingValue").textContent = fmt(r.remain);
+    document.getElementById("targetPrice").textContent = fmt(r.targetPrice);
+    document.getElementById("credit").textContent = "-" + fmt(r.remain);
+    document.getElementById("dueToday").textContent = fmt(r.due);
+
+    document.getElementById("formula").textContent =
+      `${fmt(r.targetPrice)} − (${fmt(r.currentPrice)} × ${daysLeft} ÷ ${cycleDays}) = ${fmt(r.due)}`;
+
+    renderQuickTable(p, cycleDays);
+  }
+
+  function renderQuickTable(p, cycleDays){
+    const days = parseInt(document.getElementById("daysLeft").value, 10) || 20;
+    const combos = [
+      ["plus","x5"],
+      ["plus","x20"],
+      ["x5","x20"]
+    ];
+    const tbody = document.getElementById("quickTable");
+    tbody.innerHTML = "";
+
+    combos.forEach(([cur, tar]) => {
+      const r = calcDue(cur, tar, days, cycleDays, p);
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${tierName[cur]}</td>
+        <td>${tierName[tar]}</td>
+        <td>${days}</td>
+        <td>${fmt(r.remain)}</td>
+        <td><b>${fmt(r.due)}</b></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function setPriceInputs(config){
+    const configuredPrices = config && config.prices ? config.prices : {};
+    const inputMap = { plus: "pricePlus", x5: "priceX5", x20: "priceX20" };
+
+    Object.entries(inputMap).forEach(([tier, inputId]) => {
+      const price = Number(configuredPrices[tier]);
+      if (Number.isFinite(price) && price >= 0) {
+        document.getElementById(inputId).value = price;
+      }
+    });
+  }
+
+  function setContact(config){
+    const contact = config && config.contact ? config.contact : defaultConfig.contact;
+    const trigger = document.getElementById("contactTrigger");
+    const hint = document.getElementById("contactHint");
+    const image = document.getElementById("contactImage");
+    const wechatIdButton = document.getElementById("wechatIdButton");
+    const wechatId = String(contact.wechatId || defaultConfig.contact.wechatId);
+
+    trigger.textContent = contact.label || defaultConfig.contact.label;
+    hint.textContent = contact.hint || defaultConfig.contact.hint;
+    image.src = contact.imagePath || defaultConfig.contact.imagePath;
+    image.alt = contact.imageAlt || defaultConfig.contact.imageAlt;
+    wechatIdButton.dataset.wechatId = wechatId;
+    wechatIdButton.textContent = `微信号：${wechatId}（点击复制）`;
+  }
+
+  function renderPricingSummary(p){
+    document.getElementById("pricingSummary").innerHTML =
+      `默认按你当前的人民币售价：Plus ¥${p.plus} / 月、Pro x5 ¥${p.x5} / 月、Pro x20 ¥${p.x20} / 月。<br>` +
+      "计算逻辑：新套餐从今天重新开一个完整周期，旧套餐剩余价值按剩余天数抵扣。";
+  }
+
+  async function loadConfig(){
+    try {
+      const response = await fetch("static/config.json", { cache: "no-cache" });
+      if (!response.ok) throw new Error(`无法读取配置（${response.status}）`);
+      const config = await response.json();
+      setPriceInputs({ ...defaultConfig, ...config, prices: { ...defaultConfig.prices, ...(config.prices || {}) } });
+      setContact({ ...defaultConfig, ...config, contact: { ...defaultConfig.contact, ...(config.contact || {}) } });
+    } catch (error) {
+      console.warn("未能加载 static/config.json，已使用页面默认配置。", error);
+      setPriceInputs(defaultConfig);
+      setContact(defaultConfig);
+    }
+
+    const configuredPrices = prices();
+    renderPricingSummary(configuredPrices);
+    update();
+  }
+
+  ids.forEach(id=>{
+    document.getElementById(id).addEventListener("input", update);
+    document.getElementById(id).addEventListener("change", update);
+  });
+
+  document.getElementById("contactTrigger").addEventListener("click", () => {
+    const widget = document.getElementById("contactWidget");
+    const isOpen = widget.classList.toggle("is-open");
+    document.getElementById("contactTrigger").setAttribute("aria-expanded", String(isOpen));
+  });
+
+  document.getElementById("wechatIdButton").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const wechatId = button.dataset.wechatId;
+    if (!wechatId) return;
+
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(wechatId);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = wechatId;
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        document.body.appendChild(textarea);
+        textarea.select();
+        const copied = document.execCommand("copy");
+        textarea.remove();
+        if (!copied) throw new Error("复制失败");
+      }
+      button.textContent = "已复制微信号";
+      window.setTimeout(() => {
+        button.textContent = `微信号：${button.dataset.wechatId}（点击复制）`;
+      }, 1600);
+    } catch (error) {
+      button.textContent = "复制失败，请手动复制";
+      window.setTimeout(() => {
+        button.textContent = `微信号：${button.dataset.wechatId}（点击复制）`;
+      }, 1600);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    const widget = document.getElementById("contactWidget");
+    if (!widget.contains(event.target)) {
+      widget.classList.remove("is-open");
+      document.getElementById("contactTrigger").setAttribute("aria-expanded", "false");
+    }
+  });
+
+  loadConfig();
+</script>
+</body>
+</html>
