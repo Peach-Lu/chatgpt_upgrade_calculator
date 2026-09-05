@@ -50,6 +50,10 @@
 
 标题右侧的“联系客服”按钮支持鼠标悬停或点击展开。卡片中展示二维码和微信号；点击微信号可复制到剪贴板。
 
+## 搜索关键词
+
+ChatGPT 套餐升级差价计算器、ChatGPT 升级补款、ChatGPT Plus 代充、ChatGPT Pro 代充、菲区代充、菲区 ChatGPT Plus、菲区 ChatGPT Pro、ChatGPT Plus 升级 Pro、ChatGPT Pro x5、ChatGPT Pro x20、ChatGPT 订阅充值、ChatGPT 套餐价格。
+
 ## 目录结构
 
 ```text
