@@ -1,6 +1,13 @@
-# ChatGPT 套餐升级差价计算器
+# ChatGPT Plus / Pro 套餐升级差价计算器
 
-一个静态网页工具，用于计算 ChatGPT 套餐升级时的预计补款金额。
+面向 ChatGPT Plus / Pro 订阅升级及代充前补款核算场景的静态计算工具，可计算旧套餐的剩余价值抵扣与预计补款金额。
+
+## 功能
+
+- 支持 ChatGPT Plus、Pro x5、Pro x20 套餐升级差价计算。
+- 支持按整数剩余天数计算旧套餐抵扣金额。
+- 通过 `static/config.json` 配置套餐价格、客服二维码和可复制微信号。
+- 支持部署为独立静态网页，方便在 ChatGPT Plus / Pro 订阅咨询时使用。
 
 ## 使用方式
 
@@ -50,9 +57,9 @@
 
 标题右侧的“联系客服”按钮支持鼠标悬停或点击展开。卡片中展示二维码和微信号；点击微信号可复制到剪贴板。
 
-## 搜索关键词
+## 适用场景与相关关键词
 
-ChatGPT 套餐升级差价计算器、ChatGPT 升级补款、ChatGPT Plus 代充、ChatGPT Pro 代充、菲区代充、菲区 ChatGPT Plus、菲区 ChatGPT Pro、ChatGPT Plus 升级 Pro、ChatGPT Pro x5、ChatGPT Pro x20、ChatGPT 订阅充值、ChatGPT 套餐价格。
+适用于 ChatGPT 套餐升级差价计算、ChatGPT 升级补款、ChatGPT Plus 代充前核算、ChatGPT Pro 代充前核算、ChatGPT Plus 升级 Pro、Pro x5 / Pro x20 订阅价格对照等场景。涉及菲区 ChatGPT Plus 或 Pro 订阅时，请以实际支付页面和当地适用规则为准。
 
 ## 目录结构
 
