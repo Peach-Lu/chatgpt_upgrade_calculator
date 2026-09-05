@@ -9,6 +9,7 @@
     "hint": "扫码添加微信客服",
     "imagePath": "static/wechat.JPG",
     "imageAlt": "微信客服二维码",
-    "wechatId": "lllulitao"
+    "wechatId": "lllulitao",
+    "version":1.0
   }
 }
